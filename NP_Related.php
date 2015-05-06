@@ -119,7 +119,7 @@ class NP_Related extends NucleusPlugin {
 		global $manager, $blog, $CONF;
 		
 		// include language file for this plugin
-		$language = ereg_replace( '[\\|/]', '', getLanguageName());
+		$language = str_replace( array('\\','/'), '', getLanguageName());
 		if (file_exists($this->getDirectory().$language.'.php'))
 			include_once($this->getDirectory().$language.'.php');
 		else
