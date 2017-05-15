@@ -90,14 +90,7 @@ class NP_Related extends NucleusPlugin {
 		return 'http://japan.nucleuscms.org/wiki/plugins:related'; 
 	}
 	
-	function supportsFeature($what) {
-		switch($what){
-			case 'SqlTablePrefix':
-				return 1;
-			default:
-				return 0;
-		}
-	}
+	function supportsFeature($what) {return in_array($what,array('SqlTablePrefix','SqlApi'));}
 	
 	function getTableList() {
 		return array( sql_table('plug_related'), sql_table('plug_related_cache') );
@@ -194,7 +187,7 @@ class NP_Related extends NucleusPlugin {
 		$this->createOption("flg_cache_erase", _RELATED_OPTION_FLG_CACHE_ERASE, "yesno", "no");
 		$this->createOption("flg_erase", _RELATED_OPTION_FLG_ERASE, "yesno", "no");
 
-		mysql_query("CREATE TABLE IF NOT EXISTS ". sql_table("plug_related") 
+		sql_query("CREATE TABLE IF NOT EXISTS ". sql_table("plug_related") 
 			." ( 
 			itemid INT(9) NOT NULL, 
 			localkey VARCHAR(255) NOT NULL DEFAULT '', 
@@ -203,7 +196,7 @@ class NP_Related extends NucleusPlugin {
 			mode VARCHAR(100) NOT NULL DEFAULT '', 
 			PRIMARY KEY (itemid)
 			)");
-		mysql_query("CREATE TABLE IF NOT EXISTS ". sql_table("plug_related_cache") 
+		sql_query("CREATE TABLE IF NOT EXISTS ". sql_table("plug_related_cache") 
 			." ( 
 			id INT(9) NOT NULL AUTO_INCREMENT PRIMARY KEY, 
 			type VARCHAR(255) NOT NULL, 
@@ -218,8 +211,8 @@ class NP_Related extends NucleusPlugin {
 	
 	function uninstall() {
 		if ($this->getOption('flg_erase') == 'yes') {
-			mysql_query ( "DROP table IF EXISTS ". sql_table("plug_related") );
-			mysql_query ( "DROP table IF EXISTS ". sql_table("plug_related_cache") );
+			sql_query ( "DROP table IF EXISTS ". sql_table("plug_related") );
+			sql_query ( "DROP table IF EXISTS ". sql_table("plug_related_cache") );
 		}
 	}
 
@@ -249,10 +242,10 @@ class NP_Related extends NucleusPlugin {
 	//Add options to edit item form/bookmarklet
 	function event_EditItemFormExtras($data) {
 			$id = $data['variables']['itemid'];
-			$result = mysql_query("SELECT itemid, localkey, googlekey, amazonkey, mode FROM ". sql_table("plug_related"). " WHERE itemid='$id'");
-			if (@mysql_num_rows($result) > 0) {
-				$localkey  = mysql_result($result,0,"localkey");
-				$googlekey = mysql_result($result,0,"googlekey");
+			$result = sql_query("SELECT itemid, localkey, googlekey, amazonkey, mode FROM ". sql_table("plug_related"). " WHERE itemid='$id'");
+			if (@sql_num_rows($result) > 0) {
+				$localkey  = sql_result($result,0,"localkey");
+				$googlekey = sql_result($result,0,"googlekey");
 			}
 		?>
 			<h3>Related Keyword</h3>
@@ -278,11 +271,11 @@ class NP_Related extends NucleusPlugin {
 		
 		$itemid = $data['itemid'];
 		
-		$local  = mysql_escape_string($local);
-		$google = mysql_escape_string($google);
-		$amazon = mysql_escape_string($amazon);
+		$local  = sql_escape_string($local);
+		$google = sql_escape_string($google);
+		$amazon = sql_escape_string($amazon);
 		
-		mysql_query("INSERT INTO ". sql_table("plug_related") ." VALUES ('$itemid','$local','$google','$amazon','')");
+		sql_query("INSERT INTO ". sql_table("plug_related") ." VALUES ('$itemid','$local','$google','$amazon','')");
 	}
 	
 	//PreUpdateItem Event
@@ -293,25 +286,25 @@ class NP_Related extends NucleusPlugin {
 		
 		$itemid = $data['itemid'];
 		
-		$local  = mysql_escape_string($local);
-		$google = mysql_escape_string($google);
-		$amazon = mysql_escape_string($amazon);
+		$local  = sql_escape_string($local);
+		$google = sql_escape_string($google);
+		$amazon = sql_escape_string($amazon);
 		
-		$result = mysql_query("SELECT * FROM ". sql_table("plug_related") ." WHERE itemid='$itemid'");
+		$result = sql_query("SELECT * FROM ". sql_table("plug_related") ." WHERE itemid='$itemid'");
 		
-		if (@mysql_num_rows($result) > 0) {
+		if (@sql_num_rows($result) > 0) {
 			// Nothing to do? Delete it!!
 			if ((!$local) && (!$google) && (!$amazon)) {
-				mysql_query("DELETE FROM ". sql_table("plug_related") ." WHERE itemid='$itemid'");
+				sql_query("DELETE FROM ". sql_table("plug_related") ." WHERE itemid='$itemid'");
 				return;
 			}
 			
-			mysql_query("UPDATE ". sql_table("plug_related") ." SET localkey='$local',googlekey='$google',amazonkey='$amazon' WHERE itemid='$itemid'");
+			sql_query("UPDATE ". sql_table("plug_related") ." SET localkey='$local',googlekey='$google',amazonkey='$amazon' WHERE itemid='$itemid'");
 			
 		} else {
 			// Nothing to do? Get out!!
 			if ((!$local) && (!$google) && (!$amazon)) return;
-			mysql_query("INSERT INTO ". sql_table("plug_related") ." VALUES ('$itemid','$local','$google','$amazon','')");
+			sql_query("INSERT INTO ". sql_table("plug_related") ." VALUES ('$itemid','$local','$google','$amazon','')");
 		}		
 	}
 	
@@ -376,8 +369,8 @@ class NP_Related extends NucleusPlugin {
 			case 'local':
 				$q = '';
 				$id = $item['itemid'];
-				$result = mysql_query("SELECT localkey FROM ". sql_table("plug_related") ." WHERE itemid='$id'");
-				if ($msg = mysql_fetch_array($result)) {
+				$result = sql_query("SELECT localkey FROM ". sql_table("plug_related") ." WHERE itemid='$id'");
+				if ($msg = sql_fetch_array($result)) {
 					if ($msg['localkey'] == "DONOTSEARCH") $donotsearch = true;
 					else $q = $msg['localkey'];
 				}
@@ -448,7 +441,7 @@ class NP_Related extends NucleusPlugin {
 						$ary_modq[] = $qpiece;
 					}
 					
-					$qpiece = mysql_escape_string($qpiece);
+					$qpiece = sql_escape_string($qpiece);
 					
 					$str_cat = ($str_where) ? " $qcat " : '';
 					
@@ -470,25 +463,25 @@ class NP_Related extends NucleusPlugin {
 				
 				// Select only from same weblog?
 				if ($this->currentblog == 'yes' and $skinType == 'item') {
-					$result = mysql_query("SELECT iblog FROM ". sql_table("item") ." WHERE inumber='$item[itemid]'");
-					$msg = mysql_fetch_array($result);
+					$result = sql_query("SELECT iblog FROM ". sql_table("item") ." WHERE inumber='$item[itemid]'");
+					$msg = sql_fetch_array($result);
 					$bid = $msg['iblog'];
 					$str_iblog = " AND iblog='$bid'";
 				} else {
 					$str_iblog = '';
 				}
-				$result = mysql_query("SELECT inumber, ititle, itime, ibody FROM ". sql_table("item") 
+				$result = sql_query("SELECT inumber, ititle, itime, ibody FROM ". sql_table("item") 
 					." WHERE ($str_where)" . $str_iblog
 					." AND idraft=0 AND inumber<>'$id'" 
 					." AND itime<=" . mysqldate($b->getCorrectTime())
 					." ORDER BY inumber DESC LIMIT 0,$max");
 				
 				// Do we have any rows?
-				if (@mysql_num_rows($result) > 0) {
+				if (@sql_num_rows($result) > 0) {
 					$this->_show_header($mode, $qmore);
 				
 					$first=true;
-					while ($row = mysql_fetch_object($result)) {
+					while ($row = sql_fetch_object($result)) {
 						
 						if ($first){
 							$first=false; 
@@ -542,8 +535,8 @@ class NP_Related extends NucleusPlugin {
 				if ($max > 10) $max = 10;
 				$apikey = $this->google_key;
 				
-				$result = mysql_query("SELECT googlekey FROM ". sql_table("plug_related") ." WHERE itemid='$id'");
-				if ($msg = mysql_fetch_array($result)) {
+				$result = sql_query("SELECT googlekey FROM ". sql_table("plug_related") ." WHERE itemid='$id'");
+				if ($msg = sql_fetch_array($result)) {
 					if ($msg['googlekey'] == "DONOTSEARCH") $donotsearch = true;
 					else $q = $msg['googlekey'];
 				} 
@@ -571,7 +564,7 @@ class NP_Related extends NucleusPlugin {
 				$q = trim($q);
 				$dispq = $q;
 				if ($this->toexclude != '') $q .= " -site:". $this->toexclude;
-				$q = mysql_escape_string($q);
+				$q = sql_escape_string($q);
 				
 				$this->_show_header($mode, $dispq);
 				echo <<<EOS
@@ -620,7 +613,7 @@ EOS;
 		$rand =  mt_rand (0,50);
 		if ($rand == 50) {
 			$cache = sql_query("SELECT * FROM ". sql_table("plug_related_cache"));
-			if (@mysql_num_rows($cache) > 2000) {
+			if (@sql_num_rows($cache) > 2000) {
 				sql_query("TRUNCATE TABLE ". sql_table("plug_related_cache"));
 			}
 		}
