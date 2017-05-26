@@ -81,7 +81,7 @@ class NP_Related extends NucleusPlugin {
 	}
 	
 	// version of the plugin
-	function getVersion() { return '0.5'; }
+	function getVersion() { return '0.51'; }
 	function getMinNucleusVersion() { return '250'; }
 	
 	// an URL to the plugin website
@@ -271,9 +271,9 @@ class NP_Related extends NucleusPlugin {
 		
 		$itemid = $data['itemid'];
 		
-		$local  = sql_escape_string($local);
-		$google = sql_escape_string($google);
-		$amazon = sql_escape_string($amazon);
+		$local  = sql_real_escape_string($local);
+		$google = sql_real_escape_string($google);
+		$amazon = sql_real_escape_string($amazon);
 		
 		sql_query("INSERT INTO ". sql_table("plug_related") ." VALUES ('$itemid','$local','$google','$amazon','')");
 	}
@@ -286,9 +286,9 @@ class NP_Related extends NucleusPlugin {
 		
 		$itemid = $data['itemid'];
 		
-		$local  = sql_escape_string($local);
-		$google = sql_escape_string($google);
-		$amazon = sql_escape_string($amazon);
+		$local  = sql_real_escape_string($local);
+		$google = sql_real_escape_string($google);
+		$amazon = sql_real_escape_string($amazon);
 		
 		$result = sql_query("SELECT * FROM ". sql_table("plug_related") ." WHERE itemid='$itemid'");
 		
@@ -441,7 +441,7 @@ class NP_Related extends NucleusPlugin {
 						$ary_modq[] = $qpiece;
 					}
 					
-					$qpiece = sql_escape_string($qpiece);
+					$qpiece = sql_real_escape_string($qpiece);
 					
 					$str_cat = ($str_where) ? " $qcat " : '';
 					
@@ -564,7 +564,7 @@ class NP_Related extends NucleusPlugin {
 				$q = trim($q);
 				$dispq = $q;
 				if ($this->toexclude != '') $q .= " -site:". $this->toexclude;
-				$q = sql_escape_string($q);
+				$q = sql_real_escape_string($q);
 				
 				$this->_show_header($mode, $dispq);
 				echo <<<EOS
