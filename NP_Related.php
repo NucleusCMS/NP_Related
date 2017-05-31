@@ -408,7 +408,7 @@ class NP_Related extends NucleusPlugin {
 //E					if (preg_match("/^[0-9]+$/", $quoted_keys[$qlastidx]) ) { 
 					if (preg_match("/^[0-9]+$/", mb_convert_kana($quoted_keys[$qlastidx], 'n', _CHARSET)) ) { 
 						// delete series num
-						$q = preg_replace("/". preg_quote($quoted_keys[0]) ."/", '', $q);
+						$q = preg_replace("/". preg_quote($quoted_keys[0],'/') ."/", '', $q);
 						continue;
 					}
 					$qrep = "__QUOTED{$qt_num}__";
@@ -416,7 +416,7 @@ class NP_Related extends NucleusPlugin {
 					// add comma around a quote for splitting
 					$ary_quote[$qt_num][0] = stripslashes($quoted_keys[0]); // use first match(with quote chars)
 					$ary_quote[$qt_num][1] = stripslashes($quoted_keys[$qlastidx]); //use last(without quote chars)
-					$q = preg_replace("/". preg_quote($quoted_keys[0]) ."/", ",$qrep,", $q);
+					$q = preg_replace("/". preg_quote($quoted_keys[0],'/') ."/", ",$qrep,", $q);
 					$qt_num ++;
 				}
 				
