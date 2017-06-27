@@ -251,11 +251,11 @@ class NP_Related extends NucleusPlugin {
 			<h3>Related Keyword</h3>
 			<p>
 				<label for="related_local">Local keyword(s):</label>
-				<input type="text" value="<?php echo htmlspecialchars($localkey, ENT_QUOTES, _CHARSET); ?>" id="related_local" name="local_keyword" size="60" style="width:300px;" />
+				<input type="text" value="<?php if(isset($localkey)) echo htmlspecialchars($localkey, ENT_QUOTES, _CHARSET); ?>" id="related_local" name="local_keyword" size="60" style="width:300px;" />
 			</p>
 			<p>
 				<label for="related_google">Google keyword(s):</label>
-				<input type="text" value="<?php echo htmlspecialchars($googlekey, ENT_QUOTES, _CHARSET); ?>" id="related_google" name="google_keyword" size="60" style="width:300px;" />
+				<input type="text" value="<?php if(isset($googlekey)) echo htmlspecialchars($googlekey, ENT_QUOTES, _CHARSET); ?>" id="related_google" name="google_keyword" size="60" style="width:300px;" />
 			</p>
 		<?php
 	}
@@ -459,7 +459,8 @@ class NP_Related extends NucleusPlugin {
 					
 					if (count($ary_modq) == 3) break; // max 3 words
 				}
-				$qmore = join($ary_modq, ' '); // for 'and more' query link
+				if(count($ary_modq)) $qmore = join(' ',$ary_modq); // for 'and more' query link
+				else                 $qmore = $q;
 				
 				// Select only from same weblog?
 				if ($this->currentblog == 'yes' and $skinType == 'item') {
