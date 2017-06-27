@@ -466,14 +466,20 @@ class NP_Related extends NucleusPlugin {
 					$result = sql_query("SELECT iblog FROM ". sql_table("item") ." WHERE inumber='$item[itemid]'");
 					$msg = sql_fetch_array($result);
 					$bid = $msg['iblog'];
-					$str_iblog = " AND iblog='$bid'";
+					$str_iblog = "iblog='{$bid}'";
 				} else {
 					$str_iblog = '';
 				}
+				
+				$where = array();
+				if($str_where) $where[] = "({$str_where})";
+				if($str_iblog) $where[] = $str_iblog;
+				$where[] = "idraft=0 AND inumber<>'{$id}'";
+				$where[] = 'itime<=' . mysqldate($b->getCorrectTime());
+				$where = join(' AND ', $where);
+				
 				$result = sql_query("SELECT inumber, ititle, itime, ibody FROM ". sql_table("item") 
-					." WHERE ($str_where)" . $str_iblog
-					." AND idraft=0 AND inumber<>'$id'" 
-					." AND itime<=" . mysqldate($b->getCorrectTime())
+					." WHERE {$where}"
 					." ORDER BY inumber DESC LIMIT 0,$max");
 				
 				// Do we have any rows?
