@@ -81,7 +81,7 @@ class NP_Related extends NucleusPlugin {
 	}
 	
 	// version of the plugin
-	function getVersion() { return '0.51'; }
+	function getVersion() { return '0.52'; }
 	function getMinNucleusVersion() { return '250'; }
 	
 	// an URL to the plugin website
