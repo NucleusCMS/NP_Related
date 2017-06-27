@@ -106,7 +106,7 @@ class NP_Related extends NucleusPlugin {
 		
 		// include language file for this plugin
 		$language = str_replace( array('\\','/'), '', getLanguageName());
-		if (file_exists($this->getDirectory().$language.'.php'))
+		if (is_file($this->getDirectory().$language.'.php'))
 			include_once($this->getDirectory().$language.'.php');
 		else
 			include_once($this->getDirectory().'english.php');
@@ -148,7 +148,7 @@ class NP_Related extends NucleusPlugin {
 	}
 	
 	// a description to be shown on the installed plugins listing
-	function getDescription() { 
+	function getDescription() {
 		return _RELATED_MESSAGE_DESC;
 	}
 	
@@ -375,6 +375,7 @@ class NP_Related extends NucleusPlugin {
 					else $q = $msg['localkey'];
 				}
 				
+				$q = trim($q);
 				// Is there a keyword present?
 				if ($q == "") { 
 					$q = strip_tags($item['title']);
@@ -394,7 +395,6 @@ class NP_Related extends NucleusPlugin {
 				}
 				
 				// prepare for multi-word search
-				$q = trim($q);
 				$dispq = $q;
 				$str_where = '';
 				$ary_modq = array();
